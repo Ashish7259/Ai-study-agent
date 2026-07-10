@@ -7,6 +7,7 @@ import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
+from rag import retrieve
 
 load_dotenv()
 
@@ -25,12 +26,24 @@ def health():
     })
 
 
-# ---- Placeholder routes for upcoming phases ----
 # Phase 1: RAG foundation
 @app.route("/retrieve", methods=["GET"])
-def retrieve():
+def retrieve_route():
     query = request.args.get("q", "")
-    return jsonify({"query": query, "results": [], "note": "Phase 1 not implemented yet"})
+    topic = request.args.get("topic")
+    match_count = int(request.args.get("match_count", 5))
+
+    if not query:
+        return jsonify({"error": "missing 'q' query parameter"}), 400
+
+    try:
+        results = retrieve(query, match_count=match_count, topic=topic)
+        return jsonify({"query": query, "results": results})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ---- Placeholder routes for upcoming phases ----
 
 
 # Phase 2-4: Agent pipeline

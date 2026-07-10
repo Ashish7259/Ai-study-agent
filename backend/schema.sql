@@ -7,7 +7,7 @@ create extension if not exists vector;
 create table if not exists documents (
   id bigserial primary key,
   content text not null,
-  embedding vector(1536),  -- 1536 for OpenAI text-embedding-3-small; adjust if you use a different model
+  embedding vector(384),  -- 384 for all-MiniLM-L6-v2 (local, free sentence-transformers model)
   source text,             -- e.g. filename
   topic text,               -- optional tag to filter by subject
   created_at timestamp with time zone default now()
@@ -15,7 +15,7 @@ create table if not exists documents (
 
 -- 3. Similarity search function used by the /retrieve endpoint
 create or replace function match_documents (
-  query_embedding vector(1536),
+  query_embedding vector(384),
   match_count int default 5,
   filter_topic text default null
 )

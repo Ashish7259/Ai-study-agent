@@ -1,0 +1,26 @@
+Operating Systems: Process Scheduling
+
+A process scheduler is the part of the operating system that decides which
+process runs on the CPU at any given time. The main goal is to maximize CPU
+utilization while keeping response times fair for all processes.
+
+Common scheduling algorithms include First-Come-First-Served (FCFS), which
+runs processes in the order they arrive; Shortest Job First (SJF), which
+prioritizes processes with the smallest execution time; and Round Robin,
+which gives each process a fixed time slice (quantum) before moving to the
+next one in a circular queue.
+
+Round Robin is widely used in time-sharing systems because it guarantees
+fairness — no process waits indefinitely. However, if the time quantum is
+too small, the system spends excessive time on context switching. If it's
+too large, Round Robin behaves like FCFS.
+
+Priority scheduling assigns each process a priority number, and the CPU is
+allocated to the process with the highest priority. A common issue with
+priority scheduling is starvation, where low-priority processes may never
+execute. This is often solved using aging, where a process's priority
+increases the longer it waits.
+
+Multilevel queue scheduling separates processes into different queues based
+on their type (e.g. foreground/interactive vs background/batch processes),
+with each queue having its own scheduling algorithm.
