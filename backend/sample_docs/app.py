@@ -22,7 +22,7 @@ def health():
     return jsonify({
         "status": "ok",
         "supabase_configured": bool(os.getenv("SUPABASE_URL")),
-        "llm_key_configured": bool(os.getenv("GEMINI_API_KEY")),
+        "llm_key_configured": bool(os.getenv("ANTHROPIC_API_KEY")),
         "search_key_configured": bool(os.getenv("TAVILY_API_KEY")),
     })
 
