@@ -9,6 +9,8 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from rag import retrieve
 from researcher import research
+from summarizer import summarize
+from quiz import generate_quiz
 
 load_dotenv()
 
@@ -63,18 +65,63 @@ def research_route():
         return jsonify({"error": str(e)}), 500
 
 
-# Phase 3-4: Agent pipeline
+# Phase 3: Summarizer agent
+@app.route("/summarize", methods=["POST"])
+def summarize_route():
+    data = request.get_json(force=True)
+    topic = data.get("topic", "")
+    research_notes = data.get("research_notes", "")
+
+    if not topic or not research_notes:
+        return jsonify({"error": "missing 'topic' or 'research_notes' in request body"}), 400
+
+    try:
+        result = summarize(topic, research_notes)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Phase 4: Quiz agent
+@app.route("/quiz", methods=["POST"])
+def quiz_route():
+    data = request.get_json(force=True)
+    topic = data.get("topic", "")
+    summary = data.get("summary", "")
+    num_questions = int(data.get("num_questions", 5))
+
+    if not topic or not summary:
+        return jsonify({"error": "missing 'topic' or 'summary' in request body"}), 400
+
+    try:
+        result = generate_quiz(topic, summary, num_questions=num_questions)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Full pipeline: Researcher -> Summarizer -> Quiz
 @app.route("/study-session", methods=["POST"])
 def study_session():
     data = request.get_json(force=True)
     topic = data.get("topic", "")
-    return jsonify({
-        "topic": topic,
-        "research_notes": None,
-        "summary": None,
-        "quiz": None,
-        "note": "Pipeline not implemented yet (Phases 2-5)"
-    })
+
+    if not topic:
+        return jsonify({"error": "missing 'topic' in request body"}), 400
+
+    try:
+        research_result = research(topic)
+        summary_result = summarize(topic, research_result["research_notes"])
+        quiz_result = generate_quiz(topic, summary_result["summary"])
+        return jsonify({
+            "topic": topic,
+            "research_notes": research_result["research_notes"],
+            "tool_calls": research_result["tool_calls"],
+            "summary": summary_result["summary"],
+            "quiz": quiz_result["quiz"],
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
