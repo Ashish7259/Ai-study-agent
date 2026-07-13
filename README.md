@@ -129,6 +129,17 @@ To test the "memory" behavior, run the same topic twice and confirm the
 second run's questions are different from the first (check `quiz_history`
 in Supabase to see all stored questions for a topic).
 
+### 8. Use the frontend (Phase 5)
+With the backend running (`python app.py`) and frontend running (`npm run dev`),
+open http://localhost:3000, type a topic, and click **Run**. You'll see:
+- A live pipeline rail showing which agent is currently working
+- Which tool(s) the Researcher used (📄 your docs / 🌐 the web) once it finishes
+- Collapsible raw research notes
+- Formatted study notes
+- An interactive quiz - click an option to see it marked right/wrong with an explanation, and a running score
+
+Try the example topic chips first to confirm everything's wired up before typing your own.
+
 ## Roadmap
 
 - [x] Phase 0: Project scaffold
@@ -136,7 +147,7 @@ in Supabase to see all stored questions for a topic).
 - [x] Phase 2: Researcher agent - RAG + web search tool use
 - [x] Phase 3: Summarizer agent - structured notes, stored as "memory"
 - [x] Phase 4: Quiz agent - structured JSON quiz output, avoids repeat questions
-- [ ] Phase 5: Frontend - pipeline progress UI + interactive quiz
+- [x] Phase 5: Frontend - pipeline progress UI + interactive quiz
 - [ ] Phase 6: Polish - README diagram, eval script, deployment
 
 ## Tech stack
