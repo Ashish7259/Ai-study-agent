@@ -5,6 +5,8 @@ __pycache__/
 venv/
 
 # Env files
+backend/.env
+frontend/.env.local
 .env
 .env.local
 

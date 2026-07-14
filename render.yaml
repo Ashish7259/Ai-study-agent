@@ -1,0 +1,21 @@
+# Render Blueprint - lets you deploy the backend with one click via
+# https://dashboard.render.com/blueprints
+# (Frontend is deployed separately to Vercel - see README.)
+services:
+  - type: web
+    name: ai-study-agent-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

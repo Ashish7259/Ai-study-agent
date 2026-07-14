@@ -4,15 +4,28 @@ A multi-agent study assistant: a **Researcher** agent (RAG + web search), a
 **Summarizer** agent, and a **Quiz** agent that work together to turn a topic
 into study notes and a practice quiz.
 
-> Status: Phase 0 - project scaffold. See roadmap below.
+> Status: feature-complete (Phases 0-6). See roadmap below.
 
-## Architecture (target)
+## Architecture
 
+```mermaid
+flowchart LR
+    U[User] -->|topic| F[Next.js Frontend]
+    F -->|POST /research| R[Researcher Agent]
+    R -->|search_documents| RAG[(Supabase pgvector\nRAG store)]
+    R -->|search_web| WEB[Tavily Web Search]
+    R -->|research notes| S[Summarizer Agent]
+    S -->|writes| MEM[(Supabase\nsummaries = memory)]
+    S -->|study notes| Q[Quiz Agent]
+    Q -->|reads prior questions| HIST[(Supabase\nquiz_history = memory)]
+    Q -->|structured JSON quiz| F
 ```
-Topic --> Researcher Agent --> Summarizer Agent --> Quiz Agent --> Frontend
-              |     |                                    |
-        RAG (Supabase)   Web Search (Tavily)     Structured JSON output
-```
+
+Each agent is a separate Python module (`researcher.py`, `summarizer.py`,
+`quiz.py`) orchestrated by Flask (`app.py`). The Researcher is the only
+agent that makes autonomous tool-use decisions; the Summarizer and Quiz
+agents are single-prompt steps that read/write the two Supabase tables
+acting as persistent memory across sessions.
 
 ## Setup
 
@@ -148,7 +161,59 @@ Try the example topic chips first to confirm everything's wired up before typing
 - [x] Phase 3: Summarizer agent - structured notes, stored as "memory"
 - [x] Phase 4: Quiz agent - structured JSON quiz output, avoids repeat questions
 - [x] Phase 5: Frontend - pipeline progress UI + interactive quiz
-- [ ] Phase 6: Polish - README diagram, eval script, deployment
+- [x] Phase 6: Polish - README diagram, eval script, deployment
+
+## Retrieval quality
+
+`backend/eval_retrieval.py` runs 5 test questions against the ingested
+documents and reports what fraction were answered by a genuinely relevant
+chunk. Run it yourself and drop your result here:
+
+```bash
+cd backend
+python eval_retrieval.py
+```
+
+> **Result:** _run the command above and paste your score here, e.g.
+> "5/5 (100%) on the sample Operating Systems document set" - a concrete
+> number here is worth more on a resume than the claim alone._
+
+## Screenshots
+
+_Add 1-2 screenshots or a short GIF of the running app here before sharing
+this repo - e.g. the pipeline rail mid-run, and a completed quiz card._
+`![Pipeline running](docs/screenshot-pipeline.png)`
+
+## Deployment
+
+Once everything works locally, deploy it so you have a live demo link
+(not just code) to put on your resume.
+
+### Backend -> Render
+1. Push this repo to GitHub if you haven't already
+2. Go to https://dashboard.render.com -> New -> Blueprint, and point it at
+   your repo (it reads `render.yaml` at the project root automatically)
+3. Add your real values for the env vars Render prompts for
+   (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY`,
+   `TAVILY_API_KEY`) - leave `FRONTEND_URL` for now, you'll set it after
+   deploying the frontend
+4. Deploy - Render gives you a URL like `https://ai-study-agent-backend.onrender.com`
+
+> Free-tier note: Render's free web services spin down after inactivity
+> and take ~30-60s to wake on the next request - normal for a demo project,
+> just don't be surprised by the first request being slow.
+
+### Frontend -> Vercel
+1. Go to https://vercel.com -> New Project -> import this repo
+2. Set the **root directory** to `frontend` in the import settings
+3. Add an environment variable: `NEXT_PUBLIC_BACKEND_URL` = your Render
+   backend URL from above
+4. Deploy - Vercel gives you a URL like `https://ai-study-agent.vercel.app`
+
+### Final step: lock down CORS
+Go back to Render -> your backend service -> Environment, and set
+`FRONTEND_URL` to your actual Vercel URL, then redeploy the backend. This
+ensures only your deployed frontend (not just anyone) can call your API.
 
 ## Tech stack
 
