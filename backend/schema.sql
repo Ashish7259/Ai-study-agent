@@ -52,11 +52,27 @@ create table if not exists summaries (
 );
 
 -- 5. Quiz history (Phase 4: avoid repeating questions on the same topic)
+-- explanation is also reused by the Flashcards feature as the card's "back" text
 create table if not exists quiz_history (
   id bigserial primary key,
   topic text not null,
   question text not null,
   options jsonb,
   correct_answer text,
+  explanation text,
+  created_at timestamp with time zone default now()
+);
+
+-- If you already ran this schema before the "explanation" column was added,
+-- uncomment and run this line once instead of recreating the table:
+-- alter table quiz_history add column if not exists explanation text;
+
+-- 6. Study sessions (Phase 7: history dashboard - records a completed quiz
+-- run so the frontend can show past topics with scores over time)
+create table if not exists study_sessions (
+  id bigserial primary key,
+  topic text not null,
+  score int not null,
+  total_questions int not null,
   created_at timestamp with time zone default now()
 );

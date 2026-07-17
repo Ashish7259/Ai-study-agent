@@ -88,6 +88,7 @@ def generate_quiz(topic: str, summary: str, num_questions: int = 5) -> dict:
                 "question": q["question"],
                 "options": q["options"],
                 "correct_answer": q["correct_answer"],
+                "explanation": q["explanation"],
             }
             for q in quiz
         ]
