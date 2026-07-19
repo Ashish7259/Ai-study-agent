@@ -259,6 +259,16 @@ export default function Home() {
   const [sessionSaved, setSessionSaved] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null); // { state: "uploading"|"success"|"error", message }
 
+  function resetSession() {
+    setTopic("");
+    setStage("idle");
+    setError(null);
+    setResult(null);
+    setActiveTopic("");
+    setSessionSaved(false);
+    setUploadStatus(null);
+  }
+
   async function handleFileUpload(e) {
     const file = e.target.files?.[0];
     e.target.value = ""; // allow re-selecting the same file later
@@ -348,7 +358,7 @@ export default function Home() {
   const isRunning = stage !== "idle" && stage !== "done";
 
   return (
-    <Shell activePage="session" activeTopic={stage !== "idle" ? activeTopic : null}>
+    <Shell activePage="session" activeTopic={stage !== "idle" ? activeTopic : null} onNewSession={resetSession}>
       {/* Hero */}
       <section className="mt-16 mb-section-gap text-center">
         <h1 className="font-headline-lg text-headline-lg mb-6">
@@ -364,10 +374,10 @@ export default function Home() {
           }}
         >
           <label
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl border border-slate-600 bg-slate-800 flex items-center justify-center cursor-pointer hover:border-primary-fixed transition-colors"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl border border-slate-600 bg-slate-800 flex items-center justify-center cursor-pointer hover:border-primary-fixed hover:text-primary-fixed transition-colors z-10"
             title="Upload your own notes (.txt or .pdf) into the knowledge base"
           >
-            <span className="material-symbols-outlined text-on-surface-variant">add</span>
+            <span className="text-on-surface-variant text-2xl leading-none select-none" aria-hidden="true">+</span>
             <input
               type="file"
               accept=".txt,.pdf"
